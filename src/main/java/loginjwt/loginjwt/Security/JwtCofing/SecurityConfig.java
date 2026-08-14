@@ -1,5 +1,6 @@
 package loginjwt.loginjwt.Security.JwtCofing;
 
+import jakarta.servlet.Filter;
 import loginjwt.loginjwt.Security.JwtCofing.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +30,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore((Filter) jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
