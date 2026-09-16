@@ -1,10 +1,14 @@
 package loginjwt.loginjwt.Repository;
 
 import loginjwt.loginjwt.Model.LoginEntity;
-import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface LoginRepository extends JpaRepository<LoginEntity,Long> {
-    static void save(User user) {
-    }
+import java.util.Optional;
+
+public interface LoginRepository extends JpaRepository<LoginEntity, Long> {
+
+    boolean existsByEmail(String email);
+
+    Optional<LoginEntity> findByEmail(String email);
+
 }
