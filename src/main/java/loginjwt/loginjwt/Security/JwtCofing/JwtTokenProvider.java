@@ -12,9 +12,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    // Chave secreta usada pra assinar o token (em produção, coloque em application.properties/variável de ambiente)
     private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
     private final long validityInMilliseconds = 3600000; // 1 hora
 
     public String generateToken(Authentication authentication) {
@@ -28,5 +26,26 @@ public class JwtTokenProvider {
                 .setExpiration(expiry)
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    public String getEmailFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }
