@@ -3,12 +3,15 @@ package loginjwt.loginjwt.Service;
 import loginjwt.loginjwt.Dto.LoginRequest;
 import loginjwt.loginjwt.Dto.LoginResponse;
 import loginjwt.loginjwt.Dto.RegisterRequest;
+import loginjwt.loginjwt.Exception.EmailAlreadyExistsException;
+import loginjwt.loginjwt.Exception.InvalidCredentialsException;
 import loginjwt.loginjwt.Model.LoginEntity;
 import loginjwt.loginjwt.Model.Role;
 import loginjwt.loginjwt.Repository.LoginRepository;
 import loginjwt.loginjwt.Security.JwtCofing.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +28,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
-        );
+        Authentication authentication;
+
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
+        } catch (BadCredentialsException ex) {
+            throw new InvalidCredentialsException();
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -42,7 +51,7 @@ public class AuthService {
     public LoginResponse register(RegisterRequest request) {
 
         if (repository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new EmailAlreadyExistsException(request.email());
         }
 
         LoginEntity user = new LoginEntity();
