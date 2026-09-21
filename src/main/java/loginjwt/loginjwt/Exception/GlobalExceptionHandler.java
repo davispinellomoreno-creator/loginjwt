@@ -49,4 +49,13 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(new ErrorResponse(status.value(), message));
     }
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidToken(InvalidTokenException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExpired(TokenExpiredException ex) {
+        return build(HttpStatus.GONE, ex.getMessage());
+    }
 }
